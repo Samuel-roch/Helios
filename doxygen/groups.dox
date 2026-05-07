@@ -1,0 +1,316 @@
+/**
+ * @file groups.dox
+ * @brief Doxygen group definitions for the Helios SDK.
+ *
+ * This file is the single source of truth for all @defgroup declarations.
+ * Do NOT use @defgroup in any other file — only @ingroup.
+ */
+
+// =============================================================================
+// Root
+// =============================================================================
+
+/** @defgroup HELIOS Helios SDK
+ *  @brief    Cross-platform C++ firmware framework.
+ *  @details
+ *    - Hardware-agnostic driver interfaces
+ *    - RTOS kernel abstractions
+ *    - STL-like system utilities
+ *    - MISRA C++ compliant
+ */
+
+// =============================================================================
+// Devices
+// =============================================================================
+
+/** @defgroup HELIOS_DEVICES Devices
+ *  @ingroup  HELIOS
+ *  @brief    High-level device abstractions (ICs and sensors on top of driver interfaces).
+ */
+
+/** @defgroup HELIOS_DEV_CHARGER Battery Charger
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Battery charger IC interface — status, health, CC/CV control, OTG.
+ */
+
+/** @defgroup HELIOS_DEV_FUEL_GAUGE Fuel Gauge
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Battery fuel gauge (coulomb counter) interface — SoC, capacity, alerts.
+ */
+
+/** @defgroup HELIOS_DEV_NVM Non-Volatile Memory
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Unified NVM interface — NOR Flash, NAND Flash, and EEPROM.
+ */
+
+/** @defgroup HELIOS_DEV_IMU IMU
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Inertial measurement unit interface — accelerometer, gyroscope, optional magnetometer.
+ */
+
+/** @defgroup HELIOS_DEV_TEMPERATURE Temperature Sensor
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    External temperature and optional humidity sensor interface.
+ */
+
+/** @defgroup HELIOS_DEV_CURRENT Current Sensor
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    External current, voltage, and power monitoring sensor interface.
+ */
+
+/** @defgroup HELIOS_DEV_DISTANCE Distance Sensor
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Time-of-flight and ultrasonic distance sensor interface.
+ */
+
+/** @defgroup HELIOS_DEV_TOUCH Touch Controller
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Capacitive touch controller interface — multi-touch points and gesture detection.
+ */
+
+/** @defgroup HELIOS_DEV_DISPLAY Display
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    Display device interface — drawing primitives, rotation, brightness, and flush.
+ */
+
+/** @defgroup HELIOS_DEV_IO_EXPANDER IO Expander
+ *  @ingroup  HELIOS_DEVICES
+ *  @brief    GPIO expander interface — pin configuration, port I/O, and interrupt-on-change.
+ */
+
+// =============================================================================
+// Drivers
+// =============================================================================
+
+/** @defgroup HELIOS_DRIVERS Drivers
+ *  @ingroup  HELIOS
+ *  @brief    Hardware-agnostic peripheral driver interfaces.
+ */
+
+/** @defgroup HELIOS_DRV_ADC ADC
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Analog-to-digital converter interface.
+ */
+
+/** @defgroup HELIOS_DRV_CRC CRC
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    CRC calculation engine interface.
+ */
+
+/** @defgroup HELIOS_DRV_GPIO GPIO
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    General-purpose digital I/O interface.
+ */
+
+/** @defgroup HELIOS_DRV_I2C I2C
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    I2C master/slave communication interface.
+ */
+
+/** @defgroup HELIOS_DRV_PCNT Pulse Counter
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Hardware pulse counter interface.
+ */
+
+/** @defgroup HELIOS_DRV_POWER Power
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Power management interface (sleep modes, regulators).
+ */
+
+/** @defgroup HELIOS_DRV_PWM PWM
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Pulse-width modulation output interface.
+ */
+
+/** @defgroup HELIOS_DRV_QSPI QSPI
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Quad-SPI flash memory interface.
+ */
+
+/** @defgroup HELIOS_DRV_RTC RTC
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Real-time clock interface.
+ */
+
+/** @defgroup HELIOS_DRV_SDIO SDIO
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    SD/MMC card interface.
+ */
+
+/** @defgroup HELIOS_DRV_SPI SPI
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    SPI master/slave communication interface.
+ */
+
+/** @defgroup HELIOS_DRV_TIMER Timer
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Hardware timer interface (one-shot and periodic).
+ */
+
+/** @defgroup HELIOS_DRV_UART UART
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    UART/USART serial communication interface.
+ */
+
+/** @defgroup HELIOS_DRV_USB_DEVICE USB Device
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    USB device-mode stack interface.
+ */
+
+/** @defgroup HELIOS_DRV_USB_HOST USB Host
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    USB host-mode stack interface.
+ */
+
+/** @defgroup HELIOS_DRV_WDG Watchdog
+ *  @ingroup  HELIOS_DRIVERS
+ *  @brief    Independent/window watchdog timer interface.
+ */
+
+// =============================================================================
+// Kernel
+// =============================================================================
+
+/** @defgroup HELIOS_KERNEL Kernel
+ *  @ingroup  HELIOS
+ *  @brief    RTOS-agnostic kernel abstractions (task, sync, timer).
+ */
+
+/** @defgroup HELIOS_KERNEL_TASK Task
+ *  @ingroup  HELIOS_KERNEL
+ *  @brief    Task/thread creation and lifecycle interface.
+ */
+
+/** @defgroup HELIOS_KERNEL_MUTEX Mutex
+ *  @ingroup  HELIOS_KERNEL
+ *  @brief    Mutual exclusion lock interface.
+ */
+
+/** @defgroup HELIOS_KERNEL_QUEUE Queue
+ *  @ingroup  HELIOS_KERNEL
+ *  @brief    Inter-task message queue interface.
+ */
+
+/** @defgroup HELIOS_KERNEL_SEMAPHORE Semaphore
+ *  @ingroup  HELIOS_KERNEL
+ *  @brief    Counting and binary semaphore interface.
+ */
+
+/** @defgroup HELIOS_KERNEL_TIMER Software Timer
+ *  @ingroup  HELIOS_KERNEL
+ *  @brief    Software timer interface (one-shot and periodic).
+ */
+
+// =============================================================================
+// Libraries
+// =============================================================================
+
+/** @defgroup HELIOS_LIBRARIES Libraries
+ *  @ingroup  HELIOS
+ *  @brief    High-level platform libraries (filesystem, networking).
+ */
+
+/** @defgroup HELIOS_LIB_FILESYSTEM Filesystem
+ *  @ingroup  HELIOS_LIBRARIES
+ *  @brief    Abstract filesystem interface (read, write, seek, directory).
+ */
+
+/** @defgroup HELIOS_LIB_NETIF Network Interface
+ *  @ingroup  HELIOS_LIBRARIES
+ *  @brief    Network interface abstraction (link up/down, IP config, send/recv).
+ */
+
+/** @defgroup HELIOS_LIB_STREAM Stream
+ *  @ingroup  HELIOS_LIBRARIES
+ *  @brief    Abstract byte stream interface — transport-agnostic sequential read/write.
+ */
+
+// =============================================================================
+// System Library (syslib)
+// =============================================================================
+
+/** @defgroup HELIOS_SYSLIB System Library
+ *  @ingroup  HELIOS
+ *  @brief    Portable, header-only STL-like utilities for firmware.
+ *  @details
+ *    All containers are fixed-capacity and allocation-free after construction.
+ */
+
+/** @defgroup HELIOS_SYSLIB_BYTEARRAY ByteArray
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-size raw byte buffer with helper methods.
+ */
+
+/** @defgroup HELIOS_SYSLIB_CALENDAR Calendar
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Date and time value type (year, month, day, hour, minute, second).
+ */
+
+/** @defgroup HELIOS_SYSLIB_CALLBACK Callback
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Type-erased callable wrapper (function pointer or lambda, no heap).
+ */
+
+/** @defgroup HELIOS_SYSLIB_LINKEDLIST LinkedList
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Intrusive singly-linked list.
+ */
+
+/** @defgroup HELIOS_SYSLIB_MAP Map
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-capacity key-value associative container.
+ */
+
+/** @defgroup HELIOS_SYSLIB_PAIR Pair
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Two-element tuple (key, value).
+ */
+
+/** @defgroup HELIOS_SYSLIB_QUEUE Queue
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-capacity FIFO queue (non-blocking, no RTOS dependency).
+ */
+
+/** @defgroup HELIOS_SYSLIB_SPAN Span
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Non-owning view over a contiguous sequence of elements.
+ */
+
+/** @defgroup HELIOS_SYSLIB_STACK Stack
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-capacity LIFO stack.
+ */
+
+/** @defgroup HELIOS_SYSLIB_STRING String
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-capacity null-terminated string (no heap allocation).
+ */
+
+/** @defgroup HELIOS_SYSLIB_STRINGLIST StringList
+ *  @ingroup  HELIOS_SYSLIB
+ *  @brief    Fixed-capacity list of fixed-capacity strings.
+ */
+
+// =============================================================================
+// Targets
+// =============================================================================
+
+/** @defgroup HELIOS_TARGET Targets
+ *  @ingroup  HELIOS
+ *  @brief    Platform-specific HAL bindings and type aliases.
+ */
+
+/** @defgroup HELIOS_TARGET_STM32 STM32
+ *  @ingroup  HELIOS_TARGET
+ *  @brief    STM32 HAL/LL bindings (H7, F4, L4, WB families).
+ */
+
+/** @defgroup HELIOS_TARGET_ESP32 ESP32
+ *  @ingroup  HELIOS_TARGET
+ *  @brief    ESP32 (ESP-IDF) bindings.
+ */
+
+/** @defgroup HELIOS_TARGET_QT Qt
+ *  @ingroup  HELIOS_TARGET
+ *  @brief    Qt-based desktop/simulation target for host-side testing.
+ */

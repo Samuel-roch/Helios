@@ -1,0 +1,1 @@
+#include "../api/devices/power_suply/ifuel_gauge.hpp"

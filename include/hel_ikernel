@@ -1,0 +1,5 @@
+#include "../api/libraries/kernel/ikernel.hpp"
+#include "../api/libraries/kernel/imutex.hpp"
+#include "../api/libraries/kernel/iqueue.hpp"
+#include "../api/libraries/kernel/isemaphore.hpp"
+#include "../api/libraries/kernel/itask.hpp"
