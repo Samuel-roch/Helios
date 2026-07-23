@@ -63,7 +63,7 @@
 /* F4 */
 #elif defined(STM32F401xE) || defined(STM32F405xx) || defined(STM32F407xx) || \
         defined(STM32F411xE) || defined(STM32F412Zx) || defined(STM32F429xx) || \
-        defined(STM32F446xx) || defined(STM32F4xx)
+        defined(STM32F446xx) || defined(STM32F4xx) || defined(STM32F469xx)
     #define HEL_STM32_MCU_FAMILY STM32F4xx
 
   /* L4 */

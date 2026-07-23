@@ -24,11 +24,12 @@
 
 
 #if __has_include(<FreeRTOS.h>)
+#if __has_include(<freertos/task.hpp>)
 #include <freertos/task.hpp>
 #include <freertos/mutex.hpp>
 #include <freertos/queue.hpp>
 #include <freertos/semaphore.hpp>
-
+#endif
 #elif __has_include(<threadx.h>)
 #endif
 
