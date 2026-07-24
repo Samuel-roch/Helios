@@ -106,12 +106,15 @@ public:
      * @brief  Create and start the RTOS task.
      * @param[in]  name        Task name used for debugging.
      * @param[in]  stackWords  Stack size in words (@ref StackDepthType).
-     * @param[in]  priority    Scheduling priority level.
+     * @param[in]  priority    Scheduling priority level. Must not be
+     *                         @ref TaskPriority::None or @ref TaskPriority::ISR —
+     *                         both are reserved sentinels, not schedulable priorities.
      * @return @ref ReturnCode::AnsweredRequest if the task was created and started.
      * @return @ref ReturnCode::ErrorInvalidState if the task is already running.
-     * @return @ref ReturnCode::ErrorParam if @p stackWords is zero.
+     * @return @ref ReturnCode::ErrorParam if @p stackWords is zero, or @p priority
+     *         is @ref TaskPriority::None or @ref TaskPriority::ISR.
      * @return @ref ReturnCode::ErrorOutOfMemory if the RTOS could not allocate resources.
-     * @return @ref ReturnCode::ErrorGeneral on any other failure.
+     * @return @ref ReturnCode::ErrorThreadCreateFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode start(const String&  name,
@@ -132,7 +135,7 @@ public:
      * @details Can be called from another task or from the task itself.
      * @return @ref ReturnCode::AnsweredRequest on success.
      * @return @ref ReturnCode::NotInitialized if the task has not been started.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorThreadSuspendFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode suspend() noexcept = 0;
@@ -141,7 +144,7 @@ public:
      * @brief  Resume a suspended task.
      * @return @ref ReturnCode::AnsweredRequest on success.
      * @return @ref ReturnCode::NotInitialized if the task has not been started.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorThreadResumeFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode resume() noexcept = 0;
@@ -151,7 +154,7 @@ public:
      * @details After this call the object may be re-started via @ref start().
      * @return @ref ReturnCode::AnsweredRequest on success.
      * @return @ref ReturnCode::NotInitialized if the task was not running.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorThreadDeleteFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode destroy() noexcept = 0;
@@ -187,16 +190,16 @@ public:
      * @return @c true if a higher-priority task was woken by this notification.
      */
     [[nodiscard]]
-    virtual bool notifyFromISR() noexcept = 0;
+    virtual bool notifyFromIsr() noexcept = 0;
 
     /**
      * @brief  Wait for a notification, optionally with a timeout.
-     * @param[in]  timeoutMs  Maximum time to wait in ticks, or the maximum
-     *                        value of @ref TickType to wait indefinitely.
+     * @param[in]  timeoutTicks  Maximum time to wait in RTOS ticks, or the maximum
+     *                           value of @ref TickType to wait indefinitely.
      * @return @c true if the task was notified before the timeout expired.
      */
     [[nodiscard]]
-    virtual bool notifyTake(TickType timeoutMs) noexcept = 0;
+    virtual bool notifyTake(TickType timeoutTicks) noexcept = 0;
 
 protected:
 

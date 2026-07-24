@@ -47,7 +47,7 @@ public:
      *          if any.
      * @return @ref ReturnCode::AnsweredRequest on success.
      * @return @ref ReturnCode::ErrorQueueFull if the count is already at maximum.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorSemaphoreGiveFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode give() noexcept = 0;
@@ -57,7 +57,7 @@ public:
      * @details Safe to call from an interrupt service routine.
      * @return @ref ReturnCode::AnsweredRequest on success.
      * @return @ref ReturnCode::ErrorQueueFull if the count is already at maximum.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorSemaphoreGiveFailed on any other failure.
      */
     [[nodiscard]]
     virtual ReturnCode giveFromIsr() noexcept = 0;
@@ -68,14 +68,14 @@ public:
 
     /**
      * @brief  Decrement the semaphore count, blocking until available or timeout elapses.
-     * @param[in]  timeout_ms  Maximum wait time in ticks.
-     *                         Pass the maximum value of @ref TickType to wait indefinitely.
+     * @param[in]  timeout_ticks  Maximum wait time in RTOS ticks (see @ref TickType).
+     *                            Pass the maximum value of @ref TickType to wait indefinitely.
      * @return @ref ReturnCode::AnsweredRequest if the semaphore was taken.
-     * @return @ref ReturnCode::ErrorTimeout if @p timeout_ms elapsed.
-     * @return @ref ReturnCode::ErrorGeneral on failure.
+     * @return @ref ReturnCode::ErrorTimeout if @p timeout_ticks elapsed.
+     * @return @ref ReturnCode::ErrorSemaphoreTakeFailed on any other failure.
      */
     [[nodiscard]]
-    virtual ReturnCode take(TickType timeout_ms) noexcept = 0;
+    virtual ReturnCode take(TickType timeout_ticks) noexcept = 0;
 
     // -------------------------------------------------------------------------
     // State query

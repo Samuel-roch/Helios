@@ -6,6 +6,12 @@
  * @date    2026-05-07
  * @ingroup HELIOS_KERNEL
  * @brief   RTOS kernel abstraction interface.
+ *
+ * @note  Unlike the other kernel interfaces (@ref iTask, @ref iMutex,
+ *        @ref iSemaphore, @ref iQueue), this header declares free functions
+ *        rather than an abstract class: the scheduler is a process-wide
+ *        singleton, not an instantiable per-driver resource. Each target
+ *        provides exactly one definition of every function declared here.
  */
 
 #ifndef HELIOS_KERNEL_IKERNEL_HPP_
@@ -46,11 +52,11 @@ ReturnCode stop() noexcept;
 
 /**
  * @brief  Delay the current task for the given number of ticks.
- * @details Yields execution and resumes after at least @p ms ticks.
+ * @details Yields execution and resumes after at least @p ticks RTOS ticks.
  *          Must not be called from an ISR context.
- * @param[in]  ms  Delay duration in ticks. Zero yields immediately.
+ * @param[in]  ticks  Delay duration in RTOS ticks (see @ref TickType). Zero yields immediately.
  */
-void sleep(TickType ms) noexcept;
+void sleep(TickType ticks) noexcept;
 
 /**
  * @brief  Yield the current task, allowing the scheduler to run other tasks.
@@ -66,19 +72,21 @@ void yield() noexcept;
  * @brief  Return the system tick counter.
  * @details The counter starts at zero when the scheduler is started and
  *          wraps around after reaching the maximum value of @ref TickType.
+ *          The unit is RTOS ticks, not milliseconds; convert using the
+ *          target's configured tick rate if a wall-clock duration is needed.
  * @return Current tick count.
  */
 [[nodiscard]]
-TickType getTickMs() noexcept;
+TickType getTick() noexcept;
 
 /**
  * @brief  Return the system tick counter from an ISR context.
- * @details Equivalent to @ref getTickMs() but safe to call from an
+ * @details Equivalent to @ref getTick() but safe to call from an
  *          interrupt service routine.
  * @return Current tick count.
  */
 [[nodiscard]]
-TickType getTickMsFromIsr() noexcept;
+TickType getTickFromIsr() noexcept;
 
 // -------------------------------------------------------------------------
 // Critical sections

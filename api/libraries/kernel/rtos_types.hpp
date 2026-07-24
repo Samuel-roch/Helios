@@ -91,7 +91,8 @@ using BaseType       = int32_t;
 /** @brief Unsigned base integer type (portable fallback). */
 using UBaseType      = uint32_t;
 
-/** @brief Tick-counter type in milliseconds (portable fallback). */
+/** @brief Tick-counter type; unit is implementation-defined RTOS ticks, not
+ *         necessarily milliseconds (portable fallback). */
 using TickType       = uint32_t;
 
 /** @brief Stack word element type (portable fallback). */

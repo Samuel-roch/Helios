@@ -32,6 +32,8 @@
 namespace hel
 {
 
+// @formatter:off
+
 /**
  * @enum  UartMode
  * @brief Selects the DMA/interrupt transfer mode for async UART operations.
@@ -39,11 +41,12 @@ namespace hel
  */
 enum class UartMode : uint8_t
 {
-  Normal    = 0x00U, /*!< Single-shot transfer; callback fires on completion. */
-  ToIdle    = 0x01U, /*!< Receive until the line goes idle (variable-length frames). */
-  Circular  = 0x02U  /*!< Continuous circular-DMA; half and full callbacks repeat. */
+  SingleShot        = 0x00U, /*!< Single-shot transfer; callback fires on completion. */
+  InterruptToIdle   = 0x01U, /*!< Interrupt-driven transfer; callback fires on completion. */
+  InterruptCircular = 0x02U, /*!< Continuous circular interrupt-driven transfer; callback fires on half/full completion. */
+  DMAToIdle         = 0x03U, /*!< DMA transfer with idle detection; callback fires on completion or idle. */
+  DMACircular       = 0x04U, /*!< Continuous circular DMA; callback fires on half/full completion. */
 };
-
 
 /**
  * @enum  UartEvent
@@ -68,16 +71,22 @@ enum class UartEvent : uint8_t
   AbortError        = 0x0DU, /*!< Abort triggered by an error condition. */
 };
 
+// @formatter:on
+
 /**
  * @brief Callable type used to receive asynchronous UART events.
  *
- * @details Signature: `void handler(ReturnCode code, uint16_t count) noexcept`
- *   - @p code   — operation result (e.g. @ref ReturnCode::TxComplete, @ref ReturnCode::RxComplete, @ref ReturnCode::AbortComplete).
+ * @details Signature: `void handler(UartEvent event, uint16_t count) noexcept`
+ *   - @p event  — event that occurred (see @ref UartEvent, e.g. @ref UartEvent::TxComplete,
+ *                 @ref UartEvent::RxComplete, @ref UartEvent::AbortComplete).
  *   - @p count  — bytes transferred (0 for error/abort events).
  */
 using UartCallback = Callback<void(UartEvent, uint16_t)>;
 
-
+/**
+ * @brief Default blocking timeout for UART transfers in milliseconds.
+ */
+constexpr uint32_t kUartDefaultTimeoutMs = 1000U;  /*!< Default blocking timeout for UART transfers. */
 
 /**
  * @class  iUart
@@ -138,75 +147,87 @@ public:
    * @note  Must not be called from an ISR context.
    */
   [[nodiscard]]
-  virtual ReturnCode read(ByteArray& data, uint32_t timeout_ms) noexcept = 0;
+  virtual ReturnCode read(ByteArray data, uint32_t timeout_ms) noexcept = 0;
 
   // -------------------------------------------------------------------------
-  // Asynchronous transfers
+  // Asynchronous transfers (interrupt / DMA)
   // -------------------------------------------------------------------------
 
   /**
-   * @brief     Transmit data asynchronously using interrupts.
-   * @details
-   *   - Returns immediately; completion is reported via the registered @ref UartCallback.
-   *   - The source buffer must remain valid until @ref UartEvent::TxComplete fires.
-   *   - The source buffer is not modified.
+   * @brief      Start an interrupt-driven transmission; returns immediately.
+   * @details    Completion is reported via the registered @ref UartCallback
+   *             with @ref UartEvent::TxComplete (or @ref UartEvent::TxHalfComplete
+   *             for @ref UartMode::InterruptCircular, once per half).
    *
-   * @param[in] data    Read-only view of bytes to transmit.
-   * @param[in] mode    Transfer mode (@ref UartMode::Normal or @ref UartMode::Circular).
-   * @return    ReturnCode
-   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback fires with @ref UartEvent::TxComplete.
+   * @param[in]  data  Read-only view of bytes to transmit; must remain valid
+   *                   until the callback fires.
+   * @param[in]  mode  Transfer mode; must be one of @ref UartMode::SingleShot,
+   *                   @ref UartMode::InterruptToIdle, or @ref UartMode::InterruptCircular.
+   * @return     ReturnCode
+   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback will fire.
    *   - @ref ReturnCode::FunctionBusy   : A transfer is already active; nothing started.
    *   - @ref ReturnCode::ErrorGeneral   : Peripheral fault; nothing started.
-   * @note  Completion or error is reported through the registered @ref UartCallback.
    */
   [[nodiscard]]
   virtual ReturnCode writeInterrupt(ConstByteArray data, UartMode mode) noexcept = 0;
 
   /**
-   * @brief      Receive data asynchronously using interrupts.
-   * @param[out] data    Writable view to store received bytes.
-   * @param[in]  mode    Transfer mode (@ref UartMode::Normal or @ref UartMode::ToIdle).
+   * @brief      Start an interrupt-driven reception; returns immediately.
+   * @details    Completion is reported via the registered @ref UartCallback
+   *             with @ref UartEvent::RxComplete (or @ref UartEvent::RxHalfComplete
+   *             for @ref UartMode::InterruptCircular, once per half).
+   *
+   * @param[out] data  Writable view to store received bytes; must remain valid
+   *                   until the callback fires.
+   * @param[in]  mode  Transfer mode; must be one of @ref UartMode::SingleShot,
+   *                   @ref UartMode::InterruptToIdle, or @ref UartMode::InterruptCircular.
    * @return     ReturnCode
-   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback fires with @ref ReturnCode::RxComplete.
+   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback will fire.
    *   - @ref ReturnCode::FunctionBusy   : A transfer is already active; nothing started.
    *   - @ref ReturnCode::ErrorGeneral   : Peripheral fault; nothing started.
-   * @note  Completion or error is reported through the registered @ref UartCallback.
    */
   [[nodiscard]]
-  virtual ReturnCode readInterrupt(ByteArray& data, UartMode mode) noexcept = 0;
+  virtual ReturnCode readInterrupt(ByteArray data, UartMode mode) noexcept = 0;
 
   /**
-   * @brief     Transmit data asynchronously using DMA.
-   * @details
-   *   - Returns immediately; completion is reported via the registered @ref UartCallback.
-   *   - The source buffer must remain valid until @ref UartEvent::TxComplete fires;
-   *     the DMA controller reads directly from the buffer after the call returns.
-   *   - The source buffer is not modified.
+   * @brief      Start a DMA transmission; returns immediately.
+   * @details    Completion is reported via the registered @ref UartCallback
+   *             with @ref UartEvent::TxComplete (or @ref UartEvent::TxHalfComplete
+   *             for @ref UartMode::DMACircular, once per half).
    *
-   * @param[in] data    Read-only view of bytes to transmit.
-   * @param[in] mode    Transfer mode (@ref UartMode::Normal or @ref UartMode::Circular).
-   * @return    ReturnCode
-   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback fires with @ref UartEvent::TxComplete.
+   * @param[in]  data  Read-only view of bytes to transmit; must remain valid
+   *                   until the callback fires — the DMA controller reads
+   *                   directly from it after the call returns.
+   * @param[in]  mode  Transfer mode; must be one of @ref UartMode::SingleShot,
+   *                   @ref UartMode::DMAToIdle, or @ref UartMode::DMACircular.
+   * @return     ReturnCode
+   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback will fire.
    *   - @ref ReturnCode::FunctionBusy   : A transfer is already active; nothing started.
    *   - @ref ReturnCode::ErrorGeneral   : Peripheral fault; nothing started.
-   * @note  Completion or error is reported through the registered @ref UartCallback.
    */
   [[nodiscard]]
   virtual ReturnCode writeDMA(ConstByteArray data, UartMode mode) noexcept = 0;
 
   /**
-   * @brief      Receive data asynchronously using DMA.
-   * @param[out] data    Writable view to store received bytes.
-   * @param[in]  mode    Transfer mode (@ref UartMode::Normal, @ref UartMode::ToIdle,
-   *                     or @ref UartMode::Circular).
+   * @brief      Start a DMA reception; returns immediately.
+   * @details    Completion is reported via the registered @ref UartCallback
+   *             with @ref UartEvent::RxComplete (or @ref UartEvent::RxHalfComplete
+   *             for @ref UartMode::DMACircular, once per half); idle-line
+   *             detection under @ref UartMode::DMAToIdle also reports
+   *             @ref UartEvent::RxComplete with the byte count received so far.
+   *
+   * @param[out] data  Writable view to store received bytes; must remain valid
+   *                   until the callback fires — the DMA controller writes
+   *                   directly into it after the call returns.
+   * @param[in]  mode  Transfer mode; must be one of @ref UartMode::SingleShot,
+   *                   @ref UartMode::DMAToIdle, or @ref UartMode::DMACircular.
    * @return     ReturnCode
-   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback fires with @ref ReturnCode::RxComplete.
+   *   - @ref ReturnCode::AnsweredRequest : Transfer started; callback will fire.
    *   - @ref ReturnCode::FunctionBusy   : A transfer is already active; nothing started.
    *   - @ref ReturnCode::ErrorGeneral   : Peripheral fault; nothing started.
-   * @note  Completion or error is reported through the registered @ref UartCallback.
    */
   [[nodiscard]]
-  virtual ReturnCode readDMA(ByteArray& data, UartMode mode) noexcept = 0;
+  virtual ReturnCode readDMA(ByteArray data, UartMode mode) noexcept = 0;
 
   // -------------------------------------------------------------------------
   // Abort
@@ -215,7 +236,7 @@ public:
   /**
    * @brief  Abort an ongoing asynchronous transmission.
    * @details The registered @ref UartCallback is invoked after the peripheral stops with
-   *          @ref ReturnCode::AbortComplete on success or @ref ReturnCode::AbortError on fault;
+   *          @ref UartEvent::AbortComplete on success or @ref UartEvent::AbortError on fault;
    *          the byte count delivered is implementation-defined.
    * @return ReturnCode
    *   - @ref ReturnCode::AnsweredRequest : Abort issued; callback will fire.
@@ -227,7 +248,7 @@ public:
   /**
    * @brief  Abort an ongoing asynchronous reception.
    * @details The registered @ref UartCallback is invoked after the peripheral stops with
-   *          @ref ReturnCode::AbortComplete on success or @ref ReturnCode::AbortError on fault;
+   *          @ref UartEvent::AbortComplete on success or @ref UartEvent::AbortError on fault;
    *          the byte count delivered is implementation-defined.
    * @return ReturnCode
    *   - @ref ReturnCode::AnsweredRequest : Abort issued; callback will fire.

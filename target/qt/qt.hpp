@@ -21,12 +21,13 @@
 #include <QSerialPort>
 #include <cstdint>
 
+
 /**
  * @brief Type definition for UART handle.
  *
  * This type is used to represent the UART handle in the driver.
  */
-using hel_uart_handle = QSerialPort;
+using UART_handle = QSerialPort;
 
 /**
  * @brief  Monotonic millisecond tick since the first call.
