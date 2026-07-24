@@ -17,7 +17,9 @@
 #ifndef HELIOS_TARGET_QT_HPP_
 #define HELIOS_TARGET_QT_HPP_
 
+#include <QElapsedTimer>
 #include <QSerialPort>
+#include <cstdint>
 
 /**
  * @brief Type definition for UART handle.
@@ -25,5 +27,28 @@
  * This type is used to represent the UART handle in the driver.
  */
 using hel_uart_handle = QSerialPort;
+
+/**
+ * @brief  Monotonic millisecond tick since the first call.
+ *
+ * Host-side counterpart of the HAL tick counter; the clock starts on the first
+ * call rather than at reset, so only differences between readings are meaningful.
+ *
+ * @return Milliseconds elapsed, wrapping every ~49 days like the 32-bit HAL tick.
+ */
+static inline uint32_t hel_qt_tick() noexcept
+{
+    static QElapsedTimer timer;
+    if (!timer.isValid())
+    {
+        timer.start();
+    }
+    return static_cast<uint32_t>(timer.elapsed());
+}
+
+/**
+ * @brief Millisecond tick source consumed by @ref hel::Pit.
+ */
+#define HEL_TARGET_TICK() hel_qt_tick()
 
 #endif // HELIOS_TARGET_QT_HPP_

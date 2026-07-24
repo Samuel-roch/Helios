@@ -11,6 +11,8 @@
 #ifndef HELIOS_PLATFORM_STM32_STM32_HPP_
 #define HELIOS_PLATFORM_STM32_STM32_HPP_
 
+#if __has_include("stm32_hal_legacy.h")
+
 #include <cstdint>
 #include <hel_string>
 
@@ -259,4 +261,5 @@ static inline const uint32_t* GetUniqueId() noexcept
     return uid;
 }
 
+#endif // __has_include("stm32_hal_legacy.h")
 #endif // HELIOS_PLATFORM_STM32_STM32_HPP_
