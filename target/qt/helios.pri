@@ -69,4 +69,27 @@ isEmpty(HELIOS_PRI_INCLUDED) {
             $$files($$HELIOS_ROOT/syslib/*_test.cpp, true) \
             $$files($$HELIOS_ROOT/utils/*_test.cpp, true)
     }
+
+    # ---------------------------------------------------------------------------
+    # Qt target implementations — libraries/rtos (iKernel/iMutex/iQueue/...) and
+    # drivers (iUart/...) live in the consuming Qt/ project, not in the SDK
+    # submodule itself. Pulled in here, rather than listed in Qt.pro, since they
+    # are exactly what makes <hel_*> usable on this target. Guarded with exists()
+    # — a no-op if this SDK is ever consumed from a project without a sibling
+    # Qt/ folder in this layout.
+    # ---------------------------------------------------------------------------
+
+    QT_TARGET_ROOT = $$clean_path($$PWD/../../../Qt)
+
+    exists($$QT_TARGET_ROOT/libraries/rtos) {
+        INCLUDEPATH += $$QT_TARGET_ROOT/libraries/rtos
+        SOURCES      += $$files($$QT_TARGET_ROOT/libraries/rtos/*.cpp, true)
+        HEADERS      += $$files($$QT_TARGET_ROOT/libraries/rtos/*.hpp, true)
+    }
+
+    exists($$QT_TARGET_ROOT/drivers) {
+        INCLUDEPATH += $$QT_TARGET_ROOT/drivers
+        SOURCES      += $$files($$QT_TARGET_ROOT/drivers/*.cpp, true)
+        HEADERS      += $$files($$QT_TARGET_ROOT/drivers/*.hpp, true)
+    }
 }
